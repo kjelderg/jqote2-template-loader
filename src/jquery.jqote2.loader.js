@@ -8,8 +8,7 @@
 	var error = new Error( "A template URL must be provided." )
 	  , obj   = Object.prototype
 	  , cache = {}
-	  , options
-	  , callback;
+	  , requests = {};
 	
 	/**
 	 * Pre-processes each template contained within the templates
@@ -24,7 +23,8 @@
 	 * is returned.
 	 */
 	var _preprocess = function(file) {
-		var templates = $(file).filter(options.element || 'script')
+		var options = requests[this.url].options
+		  , templates = $(file).filter(options.element || 'script')
 		  , template
 		  , i,n;
 		  
@@ -35,8 +35,8 @@
 				cache[template.id] = $.jqotec(template);
 			}
 		}
-		callback(cache);
-		options = callback = null;
+		requests[this.url].callback(cache);
+		delete requests[this.url];
 	};
 	
 	/**
@@ -97,7 +97,7 @@
 	 * 
 	 */
 	var _jqoteload = function(opts, success) {
-		var defaults, type;
+		var defaults, type, options;
 		if (opts || opts.url) {
 			options  = null;
 			type = typeof opts;
@@ -112,7 +112,7 @@
 			else if (type === 'string') {
 				options = $.extend( defaults, {url: opts} );
 			}
-			callback = success; 
+			requests[options.url] = { options: options, callback: success};
 			return $.get( options.url ).success( options.preprocess ? _preprocess : success );	
 		}
 		throw error;
