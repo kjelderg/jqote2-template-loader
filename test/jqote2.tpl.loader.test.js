@@ -81,7 +81,7 @@ $(document).ready( function()
 	
 	test( "Throws an Error if no options are  provided", function() 
 	{
-		raises( function()
+		throws( function()
 		{ 
 			$.jqoteload( null );
 		}, "Expecting an Error to be thrown when null url and options arguments passed." );
